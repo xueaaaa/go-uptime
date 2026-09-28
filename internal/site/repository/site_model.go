@@ -13,6 +13,6 @@ type SiteModel struct {
 	ConsecutiveFails int
 	Interval         time.Duration
 	LastCheckAt      *time.Time
-	NextChecktAt     time.Time
+	NextCheckAt      time.Time
 	CreatedAt        time.Time
 }
