@@ -48,10 +48,6 @@ func (s *checkService) Create(ctx context.Context, check model.Check) (uuid.UUID
 	return uuid.UUID(id.Bytes), nil
 }
 
-func (s *checkService) get(ctx context.Context, fieldName string, fieldValue any) ([]model.Check, error) {
-	return s.get(ctx, fieldName, fieldValue)
-}
-
 func (s *checkService) Get(ctx context.Context, ID uuid.UUID) (model.Check, error) {
 	pgID := pgtype.UUID{
 		Bytes: ID,
