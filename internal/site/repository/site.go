@@ -11,6 +11,7 @@ import (
 type SiteRepository interface {
 	Create(ctx context.Context, site SiteModel) (pgtype.UUID, error)
 	Get(ctx context.Context, ID pgtype.UUID) (SiteModel, error)
+	GetAll(ctx context.Context) ([]SiteModel, error)
 	Update(ctx context.Context, site SiteModel) error
 	Delete(ctx context.Context, ID pgtype.UUID) error
 }
@@ -70,6 +71,38 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 	}
 
 	return site, nil
+}
+
+func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
+	sql := `SELECT id, url, status, consecutive_fails, interval, last_check_at, next_check_at, created_at FROM sites`
+
+	sites := make([]SiteModel, 0)
+	rows, err := r.db.Query(ctx, sql)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var site SiteModel
+		err = rows.Scan(
+			&site.ID,
+			&site.URL,
+			&site.Status,
+			&site.ConsecutiveFails,
+			&site.Interval,
+			&site.LastCheckAt,
+			&site.NextCheckAt,
+			&site.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		sites = append(sites, site)
+	}
+
+	return sites, nil
 }
 
 func (r *siteRepository) Update(ctx context.Context, site SiteModel) error {

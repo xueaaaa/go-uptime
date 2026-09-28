@@ -12,6 +12,7 @@ import (
 type SiteService interface {
 	Create(ctx context.Context, site model.Site) (uuid.UUID, error)
 	Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
+	GetAll(ctx context.Context) ([]model.Site, error)
 	Update(ctx context.Context, site model.Site) error
 	Delete(ctx context.Context, ID uuid.UUID) error
 }
@@ -65,6 +66,31 @@ func (s *siteService) Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
 		NextCheckAt:      siteModel.NextCheckAt,
 		CreatedAt:        siteModel.CreatedAt,
 	}, nil
+}
+
+func (s *siteService) GetAll(ctx context.Context) ([]model.Site, error) {
+	siteModels, err := s.repo.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	sites := make([]model.Site, len(siteModels))
+	for i, v := range siteModels {
+		site := model.Site{
+			ID:               uuid.UUID(v.ID.Bytes),
+			URL:              v.URL,
+			Status:           model.Status(v.Status),
+			ConsecutiveFails: v.ConsecutiveFails,
+			Interval:         v.Interval,
+			LastCheckAt:      v.LastCheckAt,
+			NextCheckAt:      v.NextCheckAt,
+			CreatedAt:        v.CreatedAt,
+		}
+
+		sites[i] = site
+	}
+
+	return sites, nil
 }
 
 func (s *siteService) Update(ctx context.Context, site model.Site) error {
