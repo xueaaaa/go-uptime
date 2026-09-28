@@ -9,6 +9,7 @@ import (
 
 type Check struct {
 	ID         uuid.UUID
+	SiteID     uuid.UUID
 	Status     model2.Status
 	StatusCode int
 	Latency    int
