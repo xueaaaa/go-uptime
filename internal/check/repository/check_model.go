@@ -8,6 +8,7 @@ import (
 
 type CheckModel struct {
 	ID         pgtype.UUID
+	SiteID     pgtype.UUID
 	Status     int
 	StatusCode int
 	Latency    int
