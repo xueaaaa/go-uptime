@@ -27,7 +27,7 @@ func NewCheckRepository(db *pgxpool.Pool) CheckRepository {
 }
 
 func (r *checkRepository) Create(ctx context.Context, check CheckModel) (pgtype.UUID, error) {
-	sql := `INSERT INTO checks (siteId, status, statusCode, latency, error, checkedAt)
+	sql := `INSERT INTO checks (site_id, status, status_code, latency, error, checked_at)
 			VALUES ($1, $2, $3, $4, $5, $6)
 			RETURNING id;`
 

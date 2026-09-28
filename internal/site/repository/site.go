@@ -27,7 +27,7 @@ func NewSiteRepository(db *pgxpool.Pool) SiteRepository {
 
 func (r *siteRepository) Create(ctx context.Context, site SiteModel) (pgtype.UUID, error) {
 	sql := `INSERT INTO sites (url, status, consecutive_fails, interval, last_check_at, next_check_at, created_at)
-			VALUES ($1, $2, $3, $4, $5, $6, %7)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
 			RETURNING id;`
 
 	var id pgtype.UUID
@@ -66,7 +66,7 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 		&site.CreatedAt,
 	)
 	if err != nil {
-		return SiteModel{}, err
+		return SiteModel{}, errors.NotFound
 	}
 
 	return site, nil
