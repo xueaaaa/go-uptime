@@ -25,14 +25,18 @@ func NewScheduler(
 
 func (s *Scheduler) Run(ctx context.Context) error {
 	duration := 10 * time.Second /* TODO: config */
-	t := time.NewTimer(duration)
+	t := time.NewTicker(duration)
+	defer t.Stop()
+	defer close(s.jobs)
 
 	for {
 		select {
 		case <-ctx.Done():
 			return nil
 		case <-t.C:
-
+			if err := s.enqueue(ctx); err != nil {
+				return err /* TODO: Log instead of return */
+			}
 		}
 	}
 }
