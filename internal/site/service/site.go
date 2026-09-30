@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"time"
 
+	model2 "gihub.com/xueaaaa/go-uptime/internal/check/model"
 	"gihub.com/xueaaaa/go-uptime/internal/site/model"
 	"gihub.com/xueaaaa/go-uptime/internal/site/repository"
 	"github.com/google/uuid"
@@ -14,6 +16,7 @@ type SiteService interface {
 	Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
 	GetAll(ctx context.Context) ([]model.Site, error)
 	Update(ctx context.Context, site model.Site) error
+	UpdateByCheck(ctx context.Context, check model2.Check) error
 	Delete(ctx context.Context, ID uuid.UUID) error
 }
 
@@ -109,6 +112,30 @@ func (s *siteService) Update(ctx context.Context, site model.Site) error {
 	}
 
 	return s.repo.Update(ctx, siteModel)
+}
+
+func (s *siteService) UpdateByCheck(ctx context.Context, check model2.Check) error {
+	site, err := s.Get(ctx, check.SiteID)
+	if err != nil {
+		return err
+	}
+
+	if check.Status == model.Unavailable {
+		site.ConsecutiveFails++
+	} else {
+		site.ConsecutiveFails = 0
+	}
+
+	if site.ConsecutiveFails >= 2 {
+		site.Status = model.Unavailable
+	} else if check.Status == model.Available {
+		site.Status = model.Available
+	}
+
+	now := time.Now()
+	site.LastCheckAt = &now
+
+	return s.Update(ctx, site)
 }
 
 func (s *siteService) Delete(ctx context.Context, ID uuid.UUID) error {
