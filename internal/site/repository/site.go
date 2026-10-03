@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -38,7 +39,7 @@ func (r *siteRepository) Create(ctx context.Context, site SiteModel) (pgtype.UUI
 		site.URL,
 		site.Status,
 		site.ConsecutiveFails,
-		site.Interval,
+		int32(site.Interval/time.Second),
 		site.LastCheckAt,
 		site.NextCheckAt,
 		site.CreatedAt,
@@ -56,12 +57,13 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 			WHERE id = $1`
 
 	var site SiteModel
+	var intervalSecs int
 	err := r.db.QueryRow(ctx, sql, ID).Scan(
 		&site.ID,
 		&site.URL,
 		&site.Status,
 		&site.ConsecutiveFails,
-		&site.Interval,
+		&intervalSecs,
 		&site.LastCheckAt,
 		&site.NextCheckAt,
 		&site.CreatedAt,
@@ -69,6 +71,7 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 	if err != nil {
 		return SiteModel{}, errors.NotFound
 	}
+	site.Interval = time.Duration(intervalSecs) * time.Second
 
 	return site, nil
 }

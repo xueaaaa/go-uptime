@@ -9,6 +9,8 @@ CREATE TABLE sites (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE sites ALTER COLUMN id SET DEFAULT gen_random_uuid();
+
 CREATE TABLE checks (
     id UUID PRIMARY KEY,
     site_id UUID NOT NULL,
