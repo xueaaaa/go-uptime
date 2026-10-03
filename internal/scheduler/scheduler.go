@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"gihub.com/xueaaaa/go-uptime/internal/job"
-	"gihub.com/xueaaaa/go-uptime/internal/site/service"
+	"github.com/xueaaaa/go-uptime/internal/job"
+	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
 type Scheduler struct {

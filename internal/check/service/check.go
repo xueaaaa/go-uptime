@@ -3,11 +3,11 @@ package service
 import (
 	"context"
 
-	"gihub.com/xueaaaa/go-uptime/internal/check/model"
-	"gihub.com/xueaaaa/go-uptime/internal/check/repository"
-	model2 "gihub.com/xueaaaa/go-uptime/internal/site/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/check/repository"
+	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
 
 type CheckService interface {

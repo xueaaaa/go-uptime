@@ -3,9 +3,9 @@ package repository
 import (
 	"context"
 
-	"gihub.com/xueaaaa/go-uptime/internal/errors"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/xueaaaa/go-uptime/internal/errors"
 )
 
 type SiteRepository interface {
