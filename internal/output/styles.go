@@ -6,8 +6,9 @@ import (
 )
 
 var Header = pterm.DefaultHeader.
-	WithBackgroundStyle(pterm.NewStyle(pterm.BgLightWhite)).
-	WithTextStyle(pterm.NewStyle(pterm.FgLightGreen))
+	WithTextStyle(pterm.NewStyle(pterm.FgLightGreen)).
+	WithBackgroundStyle(pterm.NewStyle()).
+	WithFullWidth()
 
 var Table = pterm.DefaultTable.
 	WithHasHeader().

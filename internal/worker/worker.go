@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"gihub.com/xueaaaa/go-uptime/internal/check/model"
-	"gihub.com/xueaaaa/go-uptime/internal/job"
-	model2 "gihub.com/xueaaaa/go-uptime/internal/site/model"
+	"github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/job"
+	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
 
 type Pool struct {

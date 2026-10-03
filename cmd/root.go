@@ -8,7 +8,7 @@ import (
 
 func NewRootCmd(siteSvc service.SiteService) *cobra.Command {
 	root := &cobra.Command{
-		Use:           "uptime",
+		Use:           "go-uptime",
 		Short:         "Automatic website availability monitoring",
 		SilenceUsage:  true,
 		SilenceErrors: false,
