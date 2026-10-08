@@ -1,6 +1,6 @@
 CREATE TABLE sites (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    url TEXT NOT NULL,
+    url TEXT NOT NULL UNIQUE,
     status INTEGER NOT NULL,
     consecutive_fails INTEGER NOT NULL DEFAULT 0,
     interval INTEGER NOT NULL,

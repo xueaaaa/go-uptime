@@ -51,7 +51,8 @@ func NewSitesCmd(siteSvc service.SiteService) *cobra.Command {
 	}
 
 	sites.AddCommand(
-		NewAddCmd(siteSvc),
+		NewSiteAddCmd(siteSvc),
+		NewSiteRemoveCmd(siteSvc),
 	)
 	return sites
 }

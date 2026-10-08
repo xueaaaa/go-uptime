@@ -12,7 +12,7 @@ import (
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
-func NewAddCmd(siteSvc service.SiteService) *cobra.Command {
+func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
 	var interval time.Duration
 
 	add := &cobra.Command{

@@ -12,6 +12,7 @@ import (
 type SiteRepository interface {
 	Create(ctx context.Context, site SiteModel) (pgtype.UUID, error)
 	Get(ctx context.Context, ID pgtype.UUID) (SiteModel, error)
+	GetByUrl(ctx context.Context, url string) (SiteModel, error)
 	GetAll(ctx context.Context) ([]SiteModel, error)
 	Update(ctx context.Context, site SiteModel) error
 	Delete(ctx context.Context, ID pgtype.UUID) error
@@ -59,6 +60,30 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 	var site SiteModel
 	var intervalSecs int
 	err := r.db.QueryRow(ctx, sql, ID).Scan(
+		&site.ID,
+		&site.URL,
+		&site.Status,
+		&site.ConsecutiveFails,
+		&intervalSecs,
+		&site.LastCheckAt,
+		&site.NextCheckAt,
+		&site.CreatedAt,
+	)
+	if err != nil {
+		return SiteModel{}, errors.NotFound
+	}
+	site.Interval = time.Duration(intervalSecs) * time.Second
+
+	return site, nil
+}
+
+func (r *siteRepository) GetByUrl(ctx context.Context, url string) (SiteModel, error) {
+	sql := `SELECT id, url, status, consecutive_fails, interval, last_check_at, next_check_at, created_at FROM sites
+			WHERE url = $1`
+
+	var site SiteModel
+	var intervalSecs int
+	err := r.db.QueryRow(ctx, sql, url).Scan(
 		&site.ID,
 		&site.URL,
 		&site.Status,
