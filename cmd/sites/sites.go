@@ -24,11 +24,18 @@ func NewSitesCmd(siteSvc service.SiteService) *cobra.Command {
 			}
 
 			for _, site := range sites {
+				var lastCheckAtStr string
+				if site.LastCheckAt == nil {
+					lastCheckAtStr = "N/A"
+				} else {
+					lastCheckAtStr = site.LastCheckAt.Format("2006 Jan 02 15:04:05.000")
+				}
+
 				siteData := []string{
 					site.URL,
 					output.StatusColor(site.Status),
 					site.Interval.String(),
-					site.LastCheckAt.Format("2006 Jan 02 15:04:05.000"),
+					lastCheckAtStr,
 					site.NextCheckAt.Format("2006 Jan 02 15:04:05.000"),
 					site.CreatedAt.Format("2006 Jan 02 15:04:05.000"),
 				}

@@ -88,12 +88,13 @@ func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
 
 	for rows.Next() {
 		var site SiteModel
+		var intervalSecs int32
 		err = rows.Scan(
 			&site.ID,
 			&site.URL,
 			&site.Status,
 			&site.ConsecutiveFails,
-			&site.Interval,
+			&intervalSecs,
 			&site.LastCheckAt,
 			&site.NextCheckAt,
 			&site.CreatedAt,
@@ -101,10 +102,10 @@ func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
 		if err != nil {
 			return nil, err
 		}
+		site.Interval = time.Duration(intervalSecs) * time.Second
 
 		sites = append(sites, site)
 	}
-
 	return sites, nil
 }
 
@@ -124,7 +125,7 @@ func (r *siteRepository) Update(ctx context.Context, site SiteModel) error {
 		site.URL,
 		site.Status,
 		site.ConsecutiveFails,
-		site.Interval,
+		int32(site.Interval/time.Second),
 		site.LastCheckAt,
 		site.NextCheckAt,
 		site.ID,

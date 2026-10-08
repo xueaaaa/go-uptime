@@ -1,5 +1,5 @@
 CREATE TABLE sites (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     url TEXT NOT NULL,
     status INTEGER NOT NULL,
     consecutive_fails INTEGER NOT NULL DEFAULT 0,
@@ -9,10 +9,8 @@ CREATE TABLE sites (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE sites ALTER COLUMN id SET DEFAULT gen_random_uuid();
-
 CREATE TABLE checks (
-    id UUID PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     site_id UUID NOT NULL,
     status INTEGER NOT NULL,
     status_code INTEGER NOT NULL,

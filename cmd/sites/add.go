@@ -38,7 +38,6 @@ func NewAddCmd(siteSvc service.SiteService) *cobra.Command {
 
 			_, err := siteSvc.Create(c.Context(), site)
 			if err != nil {
-				pterm.Error.Printfln("Failed to add site: %s", err.Error())
 				return err
 			}
 

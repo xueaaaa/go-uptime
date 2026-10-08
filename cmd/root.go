@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	cmd "github.com/xueaaaa/go-uptime/cmd/sites"
+	cmdSites "github.com/xueaaaa/go-uptime/cmd/sites"
+	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
-func NewRootCmd(siteSvc service.SiteService) *cobra.Command {
+func NewRootCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *cobra.Command {
 	root := &cobra.Command{
 		Use:           "go-uptime",
 		Short:         "Automatic website availability monitoring",
@@ -15,7 +16,8 @@ func NewRootCmd(siteSvc service.SiteService) *cobra.Command {
 	}
 
 	root.AddCommand(
-		cmd.NewSitesCmd(siteSvc),
+		cmdSites.NewSitesCmd(siteSvc),
+		NewServeCmd(siteSvc, checkSvc),
 	)
 
 	return root
