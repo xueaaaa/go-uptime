@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"gihub.com/xueaaaa/go-uptime/internal/check/model"
-	"gihub.com/xueaaaa/go-uptime/internal/job"
-	model2 "gihub.com/xueaaaa/go-uptime/internal/site/model"
+	"github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/job"
+	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
 
 type Pool struct {
@@ -96,10 +96,12 @@ func (p *Pool) check(ctx context.Context, job job.Job) model.Check {
 	_, _ = io.Copy(io.Discard, resp.Body)
 
 	switch {
-	case http.StatusOK <= resp.StatusCode && resp.StatusCode <= http.StatusAlreadyReported:
+	case resp.StatusCode >= 200 && resp.StatusCode < 300:
 		base.Status = model2.Available
+		base.StatusCode = resp.StatusCode
 	default:
 		base.Status = model2.Unavailable
+		base.StatusCode = resp.StatusCode
 		base.Error = fmt.Sprintf("unexpected status code: %d", resp.StatusCode)
 	}
 

@@ -3,18 +3,20 @@ package service
 import (
 	"context"
 
-	"gihub.com/xueaaaa/go-uptime/internal/check/model"
-	"gihub.com/xueaaaa/go-uptime/internal/check/repository"
-	model2 "gihub.com/xueaaaa/go-uptime/internal/site/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/check/repository"
+	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
 
 type CheckService interface {
 	Create(ctx context.Context, check model.Check) (uuid.UUID, error)
 	Get(ctx context.Context, ID uuid.UUID) (model.Check, error)
 	GetBySiteID(ctx context.Context, siteID uuid.UUID) ([]model.Check, error)
+	GetAll(ctx context.Context) ([]model.Check, error)
 	Delete(ctx context.Context, ID uuid.UUID) error
+	DeleteOld(ctx context.Context) error
 }
 
 type checkService struct {
@@ -97,10 +99,36 @@ func (s *checkService) GetBySiteID(ctx context.Context, siteID uuid.UUID) ([]mod
 	return checks, nil
 }
 
+func (s *checkService) GetAll(ctx context.Context) ([]model.Check, error) {
+	checkModels, err := s.repo.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	checks := make([]model.Check, len(checkModels))
+	for i, v := range checkModels {
+		checks[i] = model.Check{
+			ID:         uuid.UUID(v.ID.Bytes),
+			SiteID:     uuid.UUID(v.SiteID.Bytes),
+			Status:     model2.Status(v.Status),
+			StatusCode: v.StatusCode,
+			Latency:    v.Latency,
+			Error:      v.Error,
+			CheckedAt:  v.CheckedAt,
+		}
+	}
+
+	return checks, nil
+}
+
 func (s *checkService) Delete(ctx context.Context, ID uuid.UUID) error {
 	pgID := pgtype.UUID{
 		Bytes: ID,
 		Valid: true,
 	}
 	return s.repo.Delete(ctx, pgID)
+}
+
+func (s *checkService) DeleteOld(ctx context.Context) error {
+	return s.repo.DeleteOld(ctx)
 }

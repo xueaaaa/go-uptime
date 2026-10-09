@@ -2,15 +2,19 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"time"
 
-	"gihub.com/xueaaaa/go-uptime/internal/errors"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	errors2 "github.com/xueaaaa/go-uptime/internal/errors"
 )
 
 type SiteRepository interface {
 	Create(ctx context.Context, site SiteModel) (pgtype.UUID, error)
 	Get(ctx context.Context, ID pgtype.UUID) (SiteModel, error)
+	GetByUrl(ctx context.Context, url string) (SiteModel, error)
 	GetAll(ctx context.Context) ([]SiteModel, error)
 	Update(ctx context.Context, site SiteModel) error
 	Delete(ctx context.Context, ID pgtype.UUID) error
@@ -38,13 +42,17 @@ func (r *siteRepository) Create(ctx context.Context, site SiteModel) (pgtype.UUI
 		site.URL,
 		site.Status,
 		site.ConsecutiveFails,
-		site.Interval,
+		int32(site.Interval/time.Second),
 		site.LastCheckAt,
 		site.NextCheckAt,
 		site.CreatedAt,
 	).Scan(&id)
 
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" /* Unique violation */ {
+			return pgtype.UUID{}, errors2.SiteExists
+		}
 		return pgtype.UUID{}, err
 	}
 
@@ -56,19 +64,45 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 			WHERE id = $1`
 
 	var site SiteModel
+	var intervalSecs int
 	err := r.db.QueryRow(ctx, sql, ID).Scan(
 		&site.ID,
 		&site.URL,
 		&site.Status,
 		&site.ConsecutiveFails,
-		&site.Interval,
+		&intervalSecs,
 		&site.LastCheckAt,
 		&site.NextCheckAt,
 		&site.CreatedAt,
 	)
 	if err != nil {
-		return SiteModel{}, errors.NotFound
+		return SiteModel{}, errors2.NotFound
 	}
+	site.Interval = time.Duration(intervalSecs) * time.Second
+
+	return site, nil
+}
+
+func (r *siteRepository) GetByUrl(ctx context.Context, url string) (SiteModel, error) {
+	sql := `SELECT id, url, status, consecutive_fails, interval, last_check_at, next_check_at, created_at FROM sites
+			WHERE url = $1`
+
+	var site SiteModel
+	var intervalSecs int
+	err := r.db.QueryRow(ctx, sql, url).Scan(
+		&site.ID,
+		&site.URL,
+		&site.Status,
+		&site.ConsecutiveFails,
+		&intervalSecs,
+		&site.LastCheckAt,
+		&site.NextCheckAt,
+		&site.CreatedAt,
+	)
+	if err != nil {
+		return SiteModel{}, errors2.NotFound
+	}
+	site.Interval = time.Duration(intervalSecs) * time.Second
 
 	return site, nil
 }
@@ -85,12 +119,13 @@ func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
 
 	for rows.Next() {
 		var site SiteModel
+		var intervalSecs int32
 		err = rows.Scan(
 			&site.ID,
 			&site.URL,
 			&site.Status,
 			&site.ConsecutiveFails,
-			&site.Interval,
+			&intervalSecs,
 			&site.LastCheckAt,
 			&site.NextCheckAt,
 			&site.CreatedAt,
@@ -98,8 +133,13 @@ func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
 		if err != nil {
 			return nil, err
 		}
+		site.Interval = time.Duration(intervalSecs) * time.Second
 
 		sites = append(sites, site)
+	}
+
+	if len(sites) == 0 {
+		return nil, errors2.NoSites
 	}
 
 	return sites, nil
@@ -121,7 +161,7 @@ func (r *siteRepository) Update(ctx context.Context, site SiteModel) error {
 		site.URL,
 		site.Status,
 		site.ConsecutiveFails,
-		site.Interval,
+		int32(site.Interval/time.Second),
 		site.LastCheckAt,
 		site.NextCheckAt,
 		site.ID,
@@ -130,7 +170,7 @@ func (r *siteRepository) Update(ctx context.Context, site SiteModel) error {
 		return err
 	}
 	if tag.RowsAffected() == 0 {
-		return errors.NotFound
+		return errors2.NotFound
 	}
 
 	return nil
@@ -144,7 +184,7 @@ func (r *siteRepository) Delete(ctx context.Context, ID pgtype.UUID) error {
 		return err
 	}
 	if tag.RowsAffected() == 0 {
-		return errors.NotFound
+		return errors2.NotFound
 	}
 	return nil
 }

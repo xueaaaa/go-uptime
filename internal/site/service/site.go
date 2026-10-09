@@ -4,16 +4,17 @@ import (
 	"context"
 	"time"
 
-	model2 "gihub.com/xueaaaa/go-uptime/internal/check/model"
-	"gihub.com/xueaaaa/go-uptime/internal/site/model"
-	"gihub.com/xueaaaa/go-uptime/internal/site/repository"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	model2 "github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/site/model"
+	"github.com/xueaaaa/go-uptime/internal/site/repository"
 )
 
 type SiteService interface {
 	Create(ctx context.Context, site model.Site) (uuid.UUID, error)
 	Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
+	GetByUrl(ctx context.Context, url string) (model.Site, error)
 	GetAll(ctx context.Context) ([]model.Site, error)
 	Update(ctx context.Context, site model.Site) error
 	UpdateByCheck(ctx context.Context, check model2.Check) error
@@ -24,7 +25,7 @@ type siteService struct {
 	repo repository.SiteRepository
 }
 
-func NewCheckService(repo repository.SiteRepository) SiteService {
+func NewSiteService(repo repository.SiteRepository) SiteService {
 	return &siteService{
 		repo: repo,
 	}
@@ -56,6 +57,24 @@ func (s *siteService) Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
 	}
 
 	siteModel, err := s.repo.Get(ctx, pgID)
+	if err != nil {
+		return model.Site{}, err
+	}
+
+	return model.Site{
+		ID:               uuid.UUID(siteModel.ID.Bytes),
+		URL:              siteModel.URL,
+		Status:           model.Status(siteModel.Status),
+		ConsecutiveFails: siteModel.ConsecutiveFails,
+		Interval:         siteModel.Interval,
+		LastCheckAt:      siteModel.LastCheckAt,
+		NextCheckAt:      siteModel.NextCheckAt,
+		CreatedAt:        siteModel.CreatedAt,
+	}, nil
+}
+
+func (s *siteService) GetByUrl(ctx context.Context, url string) (model.Site, error) {
+	siteModel, err := s.repo.GetByUrl(ctx, url)
 	if err != nil {
 		return model.Site{}, err
 	}

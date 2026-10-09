@@ -3,8 +3,8 @@ package model
 import (
 	"time"
 
-	model2 "gihub.com/xueaaaa/go-uptime/internal/site/model"
 	"github.com/google/uuid"
+	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
 
 type Check struct {

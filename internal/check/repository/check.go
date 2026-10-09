@@ -4,16 +4,18 @@ import (
 	"context"
 	"strings"
 
-	"gihub.com/xueaaaa/go-uptime/internal/errors"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/xueaaaa/go-uptime/internal/errors"
 )
 
 type CheckRepository interface {
 	Create(ctx context.Context, check CheckModel) (pgtype.UUID, error)
 	Get(ctx context.Context, ID pgtype.UUID) (CheckModel, error)
 	GetBySiteID(ctx context.Context, siteID pgtype.UUID) ([]CheckModel, error)
+	GetAll(ctx context.Context) ([]CheckModel, error)
 	Delete(ctx context.Context, ID pgtype.UUID) error
+	DeleteOld(ctx context.Context) error
 }
 
 type checkRepository struct {
@@ -51,10 +53,14 @@ func (r *checkRepository) Create(ctx context.Context, check CheckModel) (pgtype.
 }
 
 func (r *checkRepository) get(ctx context.Context, fieldName string, fieldValue any) ([]CheckModel, error) {
-	sql := `SELECT id, site_id, status, status_code, latency, error, checked_at FROM checks
-			WHERE ` + strings.TrimSpace(fieldName) + ` = $1`
+	sql := `SELECT id, site_id, status, status_code, latency, error, checked_at FROM checks`
+	var args []any
+	if fieldName != "" {
+		sql += ` WHERE ` + strings.TrimSpace(fieldName) + ` = $1`
+		args = append(args, fieldValue)
+	}
 
-	rows, err := r.db.Query(ctx, sql, fieldValue)
+	rows, err := r.db.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +98,7 @@ func (r *checkRepository) Get(ctx context.Context, ID pgtype.UUID) (CheckModel, 
 	if err != nil {
 		return CheckModel{}, err
 	}
+
 	if len(checks) != 1 {
 		return CheckModel{}, errors.NotFound
 	}
@@ -104,8 +111,22 @@ func (r *checkRepository) GetBySiteID(ctx context.Context, siteID pgtype.UUID) (
 	if err != nil {
 		return nil, err
 	}
+
 	if len(checks) == 0 {
 		return nil, errors.NotFound
+	}
+
+	return checks, nil
+}
+
+func (r *checkRepository) GetAll(ctx context.Context) ([]CheckModel, error) {
+	checks, err := r.get(ctx, "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	if len(checks) == 0 {
+		return nil, errors.NoChecks
 	}
 
 	return checks, nil
@@ -120,6 +141,16 @@ func (r *checkRepository) Delete(ctx context.Context, ID pgtype.UUID) error {
 	}
 	if tag.RowsAffected() == 0 {
 		return errors.NotFound
+	}
+	return nil
+}
+
+func (r *checkRepository) DeleteOld(ctx context.Context) error {
+	sql := `DELETE FROM checks WHERE checked_at < now() - interval '30 days'`
+
+	_, err := r.db.Exec(ctx, sql)
+	if err != nil {
+		return err
 	}
 	return nil
 }

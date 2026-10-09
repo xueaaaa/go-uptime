@@ -3,9 +3,9 @@ package processor
 import (
 	"context"
 
-	"gihub.com/xueaaaa/go-uptime/internal/check/model"
-	service2 "gihub.com/xueaaaa/go-uptime/internal/check/service"
-	"gihub.com/xueaaaa/go-uptime/internal/site/service"
+	"github.com/xueaaaa/go-uptime/internal/check/model"
+	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
+	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
 type Processor struct {
