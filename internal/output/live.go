@@ -12,6 +12,8 @@ import (
 )
 
 func LiveChecks(ctx context.Context, checkSvc service.CheckService, siteSvc service2.SiteService) error {
+	Header.Println("Live View")
+
 	startTime := time.Now()
 	area, err := pterm.DefaultArea.WithRemoveWhenDone(false).Start()
 	if err != nil {
@@ -46,7 +48,7 @@ func LiveChecks(ctx context.Context, checkSvc service.CheckService, siteSvc serv
 			})
 		}
 
-		out, err := pterm.DefaultTable.WithHasHeader().WithData(data).Srender()
+		out, err := Table.WithData(data).Srender()
 		if err != nil {
 			return err
 		}

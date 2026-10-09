@@ -16,6 +16,7 @@ type CheckService interface {
 	GetBySiteID(ctx context.Context, siteID uuid.UUID) ([]model.Check, error)
 	GetAll(ctx context.Context) ([]model.Check, error)
 	Delete(ctx context.Context, ID uuid.UUID) error
+	DeleteOld(ctx context.Context) error
 }
 
 type checkService struct {
@@ -126,4 +127,8 @@ func (s *checkService) Delete(ctx context.Context, ID uuid.UUID) error {
 		Valid: true,
 	}
 	return s.repo.Delete(ctx, pgID)
+}
+
+func (s *checkService) DeleteOld(ctx context.Context) error {
+	return s.repo.DeleteOld(ctx)
 }

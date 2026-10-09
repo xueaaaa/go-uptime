@@ -40,6 +40,7 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 				}
 				return nil
 			})
+			g.Go(func() error { return checkSvc.DeleteOld(ctx) })
 
 			err := g.Wait()
 			if errors.Is(err, context.Canceled) {

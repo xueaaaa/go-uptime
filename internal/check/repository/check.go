@@ -15,6 +15,7 @@ type CheckRepository interface {
 	GetBySiteID(ctx context.Context, siteID pgtype.UUID) ([]CheckModel, error)
 	GetAll(ctx context.Context) ([]CheckModel, error)
 	Delete(ctx context.Context, ID pgtype.UUID) error
+	DeleteOld(ctx context.Context) error
 }
 
 type checkRepository struct {
@@ -140,6 +141,16 @@ func (r *checkRepository) Delete(ctx context.Context, ID pgtype.UUID) error {
 	}
 	if tag.RowsAffected() == 0 {
 		return errors.NotFound
+	}
+	return nil
+}
+
+func (r *checkRepository) DeleteOld(ctx context.Context) error {
+	sql := `DELETE FROM checks WHERE checked_at < now() - interval '30 days'`
+
+	_, err := r.db.Exec(ctx, sql)
+	if err != nil {
+		return err
 	}
 	return nil
 }
