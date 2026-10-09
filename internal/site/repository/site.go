@@ -2,11 +2,13 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/xueaaaa/go-uptime/internal/errors"
+	errors2 "github.com/xueaaaa/go-uptime/internal/errors"
 )
 
 type SiteRepository interface {
@@ -47,6 +49,10 @@ func (r *siteRepository) Create(ctx context.Context, site SiteModel) (pgtype.UUI
 	).Scan(&id)
 
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" /* Unique violation */ {
+			return pgtype.UUID{}, errors2.SiteExists
+		}
 		return pgtype.UUID{}, err
 	}
 
@@ -70,7 +76,7 @@ func (r *siteRepository) Get(ctx context.Context, ID pgtype.UUID) (SiteModel, er
 		&site.CreatedAt,
 	)
 	if err != nil {
-		return SiteModel{}, errors.NotFound
+		return SiteModel{}, errors2.NotFound
 	}
 	site.Interval = time.Duration(intervalSecs) * time.Second
 
@@ -94,7 +100,7 @@ func (r *siteRepository) GetByUrl(ctx context.Context, url string) (SiteModel, e
 		&site.CreatedAt,
 	)
 	if err != nil {
-		return SiteModel{}, errors.NotFound
+		return SiteModel{}, errors2.NotFound
 	}
 	site.Interval = time.Duration(intervalSecs) * time.Second
 
@@ -159,7 +165,7 @@ func (r *siteRepository) Update(ctx context.Context, site SiteModel) error {
 		return err
 	}
 	if tag.RowsAffected() == 0 {
-		return errors.NotFound
+		return errors2.NotFound
 	}
 
 	return nil
@@ -173,7 +179,7 @@ func (r *siteRepository) Delete(ctx context.Context, ID pgtype.UUID) error {
 		return err
 	}
 	if tag.RowsAffected() == 0 {
-		return errors.NotFound
+		return errors2.NotFound
 	}
 	return nil
 }

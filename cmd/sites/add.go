@@ -1,15 +1,14 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/xueaaaa/go-uptime/internal/site/model"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
+	"github.com/xueaaaa/go-uptime/internal/util"
 )
 
 func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
@@ -22,8 +21,9 @@ func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			arg := args[0]
 
-			if _, err := url.ParseRequestURI(arg); err != nil {
-				return errors.New("specified argument is not a valid url")
+			h, err := util.CleanAddr(arg, false /* TODO: config */)
+			if err != nil {
+				return err
 			}
 
 			if interval < 10*time.Second {
@@ -31,12 +31,12 @@ func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
 			}
 
 			site := model.Site{
-				URL:       arg,
+				URL:       h,
 				Interval:  interval,
 				CreatedAt: time.Now(),
 			}
 
-			_, err := siteSvc.Create(c.Context(), site)
+			_, err = siteSvc.Create(c.Context(), site)
 			if err != nil {
 				return err
 			}

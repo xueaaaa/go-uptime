@@ -1,12 +1,10 @@
 package cmd
 
 import (
-	"errors"
-	"net/url"
-
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
+	"github.com/xueaaaa/go-uptime/internal/util"
 )
 
 func NewSiteRemoveCmd(siteSvc service.SiteService) *cobra.Command {
@@ -17,16 +15,18 @@ func NewSiteRemoveCmd(siteSvc service.SiteService) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			arg := args[0]
 
-			if _, err := url.ParseRequestURI(arg); err != nil {
-				return errors.New("specified argument is not a valid url")
-			}
+			h, err := util.CleanAddr(arg, false /* TODO: config */)
 
-			got, err := siteSvc.GetByUrl(c.Context(), arg)
 			if err != nil {
 				return err
 			}
 
-			if err := siteSvc.Delete(c.Context(), got.ID); err != nil {
+			got, err := siteSvc.GetByUrl(c.Context(), h)
+			if err != nil {
+				return err
+			}
+
+			if err = siteSvc.Delete(c.Context(), got.ID); err != nil {
 				return err
 			}
 

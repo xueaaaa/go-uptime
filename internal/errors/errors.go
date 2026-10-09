@@ -5,3 +5,4 @@ import (
 )
 
 var NotFound = errors.New("requested resource not found")
+var SiteExists = errors.New("site already exists")
