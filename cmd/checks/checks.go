@@ -16,6 +16,8 @@ func NewChecksCmd(checkSvc service.CheckService, siteSvc service2.SiteService) *
 		Use:   "checks",
 		Short: "Displays all site checks (limit - 100 latest checks)",
 		RunE: func(c *cobra.Command, args []string) error {
+			output.Header.Println("Table of checks")
+
 			checks, err := checkSvc.GetAll(c.Context())
 			if err != nil {
 				return err

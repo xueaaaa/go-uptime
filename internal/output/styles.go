@@ -43,7 +43,7 @@ func StatusColor(status model.Status) string {
 func StatusCodeColor(statusCode int) string {
 	switch {
 	case statusCode >= 200 && statusCode < 300:
-		return pterm.LightGreen(statusCode, http.StatusText(statusCode))
+		return pterm.LightGreen(statusCode, " ", http.StatusText(statusCode))
 	default:
 		pterm.LightRed(statusCode, http.StatusText(statusCode))
 	}

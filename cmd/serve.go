@@ -8,6 +8,7 @@ import (
 	"github.com/xueaaaa/go-uptime/internal/check/model"
 	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
 	"github.com/xueaaaa/go-uptime/internal/job"
+	"github.com/xueaaaa/go-uptime/internal/output"
 	"github.com/xueaaaa/go-uptime/internal/processor"
 	"github.com/xueaaaa/go-uptime/internal/scheduler"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
@@ -16,7 +17,9 @@ import (
 )
 
 func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *cobra.Command {
-	return &cobra.Command{
+	var silent bool
+
+	serve := &cobra.Command{
 		Use:   "serve",
 		Short: "Start background sites monitoring",
 		RunE: func(c *cobra.Command, _ []string) error {
@@ -31,6 +34,12 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 			g.Go(func() error { return sched.Run(ctx) })
 			g.Go(func() error { return workPool.Run(ctx) })
 			g.Go(func() error { return proc.Run(ctx) })
+			g.Go(func() error {
+				if !silent {
+					return output.LiveChecks(ctx, checkSvc, siteSvc)
+				}
+				return nil
+			})
 
 			err := g.Wait()
 			if errors.Is(err, context.Canceled) {
@@ -39,4 +48,9 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 			return err
 		},
 	}
+
+	serve.Flags().BoolVarP(&silent, "silent", "s", false,
+		"disables the output of information about completed checks")
+
+	return serve
 }
