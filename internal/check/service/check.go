@@ -14,6 +14,7 @@ type CheckService interface {
 	Create(ctx context.Context, check model.Check) (uuid.UUID, error)
 	Get(ctx context.Context, ID uuid.UUID) (model.Check, error)
 	GetBySiteID(ctx context.Context, siteID uuid.UUID) ([]model.Check, error)
+	GetAll(ctx context.Context) ([]model.Check, error)
 	Delete(ctx context.Context, ID uuid.UUID) error
 }
 
@@ -77,6 +78,28 @@ func (s *checkService) GetBySiteID(ctx context.Context, siteID uuid.UUID) ([]mod
 	}
 
 	checkModels, err := s.repo.GetBySiteID(ctx, pgID)
+	if err != nil {
+		return nil, err
+	}
+
+	checks := make([]model.Check, len(checkModels))
+	for i, v := range checkModels {
+		checks[i] = model.Check{
+			ID:         uuid.UUID(v.ID.Bytes),
+			SiteID:     uuid.UUID(v.SiteID.Bytes),
+			Status:     model2.Status(v.Status),
+			StatusCode: v.StatusCode,
+			Latency:    v.Latency,
+			Error:      v.Error,
+			CheckedAt:  v.CheckedAt,
+		}
+	}
+
+	return checks, nil
+}
+
+func (s *checkService) GetAll(ctx context.Context) ([]model.Check, error) {
+	checkModels, err := s.repo.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

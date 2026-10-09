@@ -137,6 +137,11 @@ func (r *siteRepository) GetAll(ctx context.Context) ([]SiteModel, error) {
 
 		sites = append(sites, site)
 	}
+
+	if len(sites) == 0 {
+		return nil, errors2.NoSites
+	}
+
 	return sites, nil
 }
 

@@ -63,6 +63,7 @@ func (s *siteService) Get(ctx context.Context, ID uuid.UUID) (model.Site, error)
 
 	return model.Site{
 		ID:               uuid.UUID(siteModel.ID.Bytes),
+		URL:              siteModel.URL,
 		Status:           model.Status(siteModel.Status),
 		ConsecutiveFails: siteModel.ConsecutiveFails,
 		Interval:         siteModel.Interval,

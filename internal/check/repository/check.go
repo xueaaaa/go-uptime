@@ -13,6 +13,7 @@ type CheckRepository interface {
 	Create(ctx context.Context, check CheckModel) (pgtype.UUID, error)
 	Get(ctx context.Context, ID pgtype.UUID) (CheckModel, error)
 	GetBySiteID(ctx context.Context, siteID pgtype.UUID) ([]CheckModel, error)
+	GetAll(ctx context.Context) ([]CheckModel, error)
 	Delete(ctx context.Context, ID pgtype.UUID) error
 }
 
@@ -51,10 +52,14 @@ func (r *checkRepository) Create(ctx context.Context, check CheckModel) (pgtype.
 }
 
 func (r *checkRepository) get(ctx context.Context, fieldName string, fieldValue any) ([]CheckModel, error) {
-	sql := `SELECT id, site_id, status, status_code, latency, error, checked_at FROM checks
-			WHERE ` + strings.TrimSpace(fieldName) + ` = $1`
+	sql := `SELECT id, site_id, status, status_code, latency, error, checked_at FROM checks`
+	var args []any
+	if fieldName != "" {
+		sql += ` WHERE ` + strings.TrimSpace(fieldName) + ` = $1`
+		args = append(args, fieldValue)
+	}
 
-	rows, err := r.db.Query(ctx, sql, fieldValue)
+	rows, err := r.db.Query(ctx, sql, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -92,6 +97,7 @@ func (r *checkRepository) Get(ctx context.Context, ID pgtype.UUID) (CheckModel, 
 	if err != nil {
 		return CheckModel{}, err
 	}
+
 	if len(checks) != 1 {
 		return CheckModel{}, errors.NotFound
 	}
@@ -104,8 +110,22 @@ func (r *checkRepository) GetBySiteID(ctx context.Context, siteID pgtype.UUID) (
 	if err != nil {
 		return nil, err
 	}
+
 	if len(checks) == 0 {
 		return nil, errors.NotFound
+	}
+
+	return checks, nil
+}
+
+func (r *checkRepository) GetAll(ctx context.Context) ([]CheckModel, error) {
+	checks, err := r.get(ctx, "", "")
+	if err != nil {
+		return nil, err
+	}
+
+	if len(checks) == 0 {
+		return nil, errors.NoChecks
 	}
 
 	return checks, nil

@@ -1,6 +1,8 @@
 package output
 
 import (
+	"net/http"
+
 	"github.com/pterm/pterm"
 	"github.com/xueaaaa/go-uptime/internal/site/model"
 )
@@ -33,6 +35,17 @@ func StatusColor(status model.Status) string {
 		return pterm.LightRed("Unavailable")
 	case status == model.Available:
 		return pterm.LightGreen("Available")
+	}
+
+	return ""
+}
+
+func StatusCodeColor(statusCode int) string {
+	switch {
+	case statusCode >= 200 && statusCode < 300:
+		return pterm.LightGreen(statusCode, http.StatusText(statusCode))
+	default:
+		pterm.LightRed(statusCode, http.StatusText(statusCode))
 	}
 
 	return ""
