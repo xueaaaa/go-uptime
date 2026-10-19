@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <title>go-uptime</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Average+Sans&family=Golos+Text:wght@400..900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="/static/style.css"/>
+        <link rel="icon" href="/static/favicon.png"/>
+    </head>
+    <body>
+        <header>
+            <h1 class="page-title">go-uptime monitor</h1>
+
+            <input type="text" id="url-search" class="url-search" placeholder="Enter URL to find..." />
+        </header>
+
+        <main class="content">
+            <div class="content-wrapper">
+                <section class="content-header">
+                    <h2 class="content-title">Monitored URLs</h2>
+                </section>
+
+                <section class="content-body">
+                    <aside class="summary-info">
+                        <div class="summary-item">
+                            {{ if eq .Total 0 }}
+                            <span class="summary-content">No sites</span>
+                            {{ else if eq .Total 1 }}
+                            <span class="summary-content">1 site</span>
+                            {{ else }}
+                            <span class="summary-content">{{ .Total }} sites</span>
+                            {{ end }}
+                        </div>
+
+                        {{ if ne .Total 0 }}
+                        <span>|</span>
+
+                        <div class="summary-item">
+                            <div class="status-indicator status-indicator--up"></div>
+                            <span>{{ .Available }}</span>
+                        </div>
+
+                        <span>|</span>
+
+                        <div class="summary-item">
+                            <div class="status-indicator status-indicator--down"></div>
+                            <span>{{ .Unavailable }}</span>
+                        </div>
+
+                        <span>|</span>
+
+                        <div class="summary-item">
+                            <div class="status-indicator status-indicator--unknown"></div>
+                            <span>{{ .Unknown }}</span>
+                        </div>
+                        {{ end }}
+                    </aside>
+
+                    <table id="urls-table" class="urls-table">
+                        <thead>
+                            <tr>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Interval</th>
+                                <th>Last Checked</th>
+                            </tr>
+                        </thead>
+                        <tbody id="urls-table-body">
+                        {{ range .Sites }}
+                            <tr>
+                                <td>{{ .URL }}</td>
+                                <td>
+                                    {{ if eq .Class "available" }}
+                                    <div class="status-item">
+                                        <div class="status-indicator status-indicator--up"></div>
+                                        <span>Up</span>
+                                    </div>
+                                    {{ else if eq .Class "unavailable" }}
+                                    <div class="status-item">
+                                        <div class="status-indicator status-indicator--down"></div>
+                                        <span>Down</span>
+                                    </div>
+                                    {{ else }}
+                                    <div class="status-item">
+                                        <div class="status-indicator status-indicator--unknown"></div>
+                                        <span>Unknown</span>
+                                    </div>
+                                    {{ end }}
+                                </td>
+                                <td>{{ .Interval }}</td>
+                                <td>{{ .LastCheck }}</td>
+                            </tr>
+                        {{ end }}
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </main>
+
+        <script src="/static/script.js"></script>
+    </body>
+</html>
