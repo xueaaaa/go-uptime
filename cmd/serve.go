@@ -12,12 +12,14 @@ import (
 	"github.com/xueaaaa/go-uptime/internal/processor"
 	"github.com/xueaaaa/go-uptime/internal/scheduler"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
+	"github.com/xueaaaa/go-uptime/internal/web"
 	"github.com/xueaaaa/go-uptime/internal/worker"
 	"golang.org/x/sync/errgroup"
 )
 
 func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *cobra.Command {
 	var silent bool
+	var enableWeb bool
 
 	serve := &cobra.Command{
 		Use:   "serve",
@@ -34,6 +36,13 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 			g.Go(func() error { return sched.Run(ctx) })
 			g.Go(func() error { return workPool.Run(ctx) })
 			g.Go(func() error { return proc.Run(ctx) })
+			g.Go(func() error {
+				if enableWeb {
+					server := web.NewServer("0.0.0.0:8080" /* TODO: config */, siteSvc, checkSvc)
+					return server.Run(ctx)
+				}
+				return nil
+			})
 			g.Go(func() error {
 				if !silent {
 					return output.LiveChecks(ctx, checkSvc, siteSvc)
@@ -52,6 +61,8 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 
 	serve.Flags().BoolVarP(&silent, "silent", "s", false,
 		"disables the output of information about completed checks")
+	serve.Flags().BoolVarP(&enableWeb, "web", "w", true,
+		"enables web display")
 
 	return serve
 }

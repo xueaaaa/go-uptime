@@ -1,0 +1,163 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg-color: #0a0a0a;
+    --container-color: #19191a;
+    --container-color-light: #2a2a2a;
+    --accent-color: #b0aaa8;
+    --accent-color-light: #938a87;
+    --text-color: #ededed;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --unknown-color: #9e9e9e;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: "Average Sans", sans-serif;
+}
+
+h1, h2, h3 {
+    font-family: "Golos Text", sans-serif;
+    font-style: normal;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+a {
+    font-family: "Golos Text", sans-serif;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-color-light);
+}
+
+.page-title {
+    margin: 20px;
+    text-align: center;
+}
+
+.content-title {
+    text-align: center;
+}
+
+.url-search {
+    background-color: var(--container-color);
+    color: var(--text-color);
+    border: 0px;
+    padding: 10px;
+    display: block;
+    margin: 0 auto;
+    width: min(90%, 400px);
+}
+
+.url-search:focus {
+    outline: 0px;
+    box-shadow: 0px 0px 5px var(--accent-color);
+}
+
+.content {
+    margin: 0 auto;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    padding: 20px;
+    width: 100%;
+    max-width: 1400px;
+}
+
+.content-body {
+    margin-top: 20px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.summary-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    margin-bottom: 10px;
+    gap: 10px;
+}
+
+.summary-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+}
+
+.status-indicator {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.status-indicator--up {
+    background-color: var(--success-color);
+}
+
+.status-indicator--down {
+    background-color: var(--error-color);
+}
+
+.status-indicator--unknown {
+    background-color: var(--unknown-color);
+}
+
+.urls-table {
+    width: 100%;
+    border-spacing: 0;
+}
+
+.urls-table th {
+    color: var(--accent-color-light);
+    text-align: center;
+    border-bottom: 1px solid var(--accent-color-light);
+}
+
+.urls-table td {
+    text-align: center;
+    padding: 5px;
+    border-bottom: 1px solid var(--accent-color-light);
+}
+
+.urls-table tbody tr:hover {
+    background-color: var(--container-color-light);
+}
+
+.status-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.status-code--success {
+    color: var(--success-color);
+}
+
+.status-code--failure {
+    color: var(--error-color);
+}
+
+.latency--great {
+    color: var(--success-color);
+}
+
+.latency--medium {
+    color: var(--warning-color);
+}
+
+.latency--bad {
+    color: var(--error-color);
+}

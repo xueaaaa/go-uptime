@@ -1,0 +1,117 @@
+body {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-items: center;
+    height: 100vh;
+    justify-items: center;
+}
+
+main {
+    padding: 20px;
+    max-width: 1400px;
+    width: 100%;
+}
+
+.site-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.site-header__actions {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-top: 10px;
+}
+
+.site-header__action {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.site-header__action-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.site-header__action-back {
+    display: flex;
+    align-items: center;
+    font: inherit;
+}
+
+.site-header__action-interval {
+    display: flex;
+    align-items: center;
+    color: var(--warning-color);
+    gap: 5px;
+}
+
+.site-header__action-delete {
+    display: flex;
+    align-items: center;
+    color: var(--error-color);
+    gap: 5px;
+}
+
+.site-header__actions button {
+    background: none;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.site-header__actions button:hover {
+    text-decoration: underline;
+}
+
+.site-dialog {
+    background-color: var(--container-color);
+    color: var(--text-color);
+    border: 1px solid var(--accent-color-light);
+    padding: 24px;
+    width: min(90%, 400px);
+    margin: auto;
+}
+
+.site-dialog::backdrop {
+    background: #0009;
+}
+
+.site-dialog form {
+    display: grid;
+    gap: 12px;
+}
+
+.site-dialog input {
+    background-color: var(--container-color-light);
+    color: var(--text-color);
+    border: 1px solid var(--accent-color-light);
+    padding: 8px;
+    font: inherit;
+}
+
+.site-dialog__actions {
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+}
+
+.site-dialog__actions button {
+    background-color: var(--container-color-light);
+    color: var(--text-color);
+    border: 1px solid var(--accent-color-light);
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.site-dialog__actions button:hover {
+    background-color: var(--accent-color-light);
+}
+
+.site-dialog__error, .site-dialog__delete {
+    color: var(--error-color);
+}
