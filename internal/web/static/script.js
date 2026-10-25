@@ -39,7 +39,7 @@ new EventSource("/events/sites").onmessage = e => {
 
     tbody.innerHTML = d.sites.map(s => `
         <tr>
-            <td>${esc(s.url)}</td>
+            <td><a href="/site/${esc(s.id)}">${esc(s.url)}</a></td>
             <td>
                 <div class="status-item">
                     ${dot(s.class)}

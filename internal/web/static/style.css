@@ -12,6 +12,7 @@
     --accent-color-light: #938a87;
     --text-color: #ededed;
     --success-color: #4caf50;
+    --warning-color: #ff9800;
     --error-color: #f44336;
     --unknown-color: #9e9e9e;
 }
@@ -28,6 +29,16 @@ h1, h2, h3 {
     font-optical-sizing: auto;
     font-weight: 700;
     color: var(--accent-color);
+}
+
+a {
+    font-family: "Golos Text", sans-serif;
+    color: var(--accent-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--accent-color-light);
 }
 
 .page-title {
@@ -129,4 +140,24 @@ h1, h2, h3 {
     align-items: center;
     justify-content: center;
     gap: 5px;
+}
+
+.status-code--success {
+    color: var(--success-color);
+}
+
+.status-code--failure {
+    color: var(--error-color);
+}
+
+.latency--great {
+    color: var(--success-color);
+}
+
+.latency--medium {
+    color: var(--warning-color);
+}
+
+.latency--bad {
+    color: var(--error-color);
 }

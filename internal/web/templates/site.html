@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>go-uptime - {{ .FormattedURL }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Average+Sans&family=Golos+Text:wght@400..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css"/>
+    <link rel="stylesheet" href="/static/site.css"/>
+    <link rel="icon" href="/static/favicon.png"/>
+</head>
+<body>
+<header class="site-header">
+    <h1><a href="{{ .URL }}">{{ .FormattedURL }}</a></h1>
+    <div class="site-header__actions">
+        <a href="/" class="site-header__action-back">Back</a>
+        <button type="button" class="site-header__action-interval" data-dialog="interval-dialog">
+            <span>Change Interval</span>
+        </button>
+        <button type="button" class="site-header__action-delete" data-dialog="delete-dialog">
+            <span>Delete</span>
+        </button>
+    </div>
+</header>
+
+<main>
+    <section class="content-header">
+        <h2 class="content-title">Check History</h2>
+    </section>
+
+    <section class="content-body">
+        <aside class="summary-info">
+            <div class="summary-item">
+                <span class="summary-content">{{ .Total }} checks</span>
+            </div>
+
+            <span>|</span>
+
+            <div class="summary-item">
+                <div class="status-indicator status-indicator--up"></div>
+                <span>{{ .Success }}</span>
+            </div>
+
+            <span>|</span>
+
+            <div class="summary-item">
+                <div class="status-indicator status-indicator--down"></div>
+                <span>{{ .Failure }}</span>
+            </div>
+
+            <span>|</span>
+
+            <div class="status-item">
+                <div class="status-indicator status-indicator--unknown"></div>
+                <span>{{ .Unknown }}</span>
+            </div>
+        </aside>
+
+        <table id="urls-table" class="urls-table">
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th>Status Code</th>
+                <th>Latency</th>
+                <th>Error</th>
+                <th>Check Time</th>
+            </tr>
+            </thead>
+            <tbody id="urls-table-body">
+            {{ range .Checks }}
+            <tr>
+                <td>
+                    <div class="status-item">
+                        {{ if eq .Class "success" }}
+                        <div class="status-indicator status-indicator--up"></div><span>Success</span>
+                        {{ else if eq .Class "failure" }}
+                        <div class="status-indicator status-indicator--down"></div><span>Failure</span>
+                        {{ else }}
+                        <div class="status-indicator status-indicator--unknown"></div><span>Unknown</span>
+                        {{ end }}
+                    </div>
+                </td>
+                <td><span class="status-code--{{ .Class }}">{{ if .StatusCode }}{{ .StatusCode }}{{ else }}—{{ end }}</span></td>
+                <td><span class="latency--{{ .LatencyClass }}">{{ .Latency }} ms</span></td>
+                <td>{{ if .Error }}{{ .Error }}{{ else }}—{{ end }}</td>
+                <td>{{ .CheckedAt }}</td>
+            </tr>
+            {{ else }}
+            <tr>
+                <td colspan="5">No checks yet</td>
+            </tr>
+            {{ end }}
+            </tbody>
+        </table>
+    </section>
+</main>
+<dialog id="interval-dialog" class="site-dialog" {{ if .IntervalError }}data-open{{ end }}>
+    <form method="post" action="/site/{{ .ID }}/interval">
+        <h2>Change Interval</h2>
+        <label for="interval">Check interval</label>
+        <input id="interval" name="interval" type="text" value="{{ .Interval }}" placeholder="30s, 5m" required/>
+        <p>Minimum: 10 seconds.</p>
+        {{ if .IntervalError }}<p class="site-dialog__error">Enter an interval in whole seconds of at least 10 seconds, such as 30s or 5m.</p>{{ end }}
+        <div class="site-dialog__actions">
+            <button type="submit" formmethod="dialog" formnovalidate>Cancel</button>
+            <button type="submit">Save</button>
+        </div>
+    </form>
+</dialog>
+<dialog id="delete-dialog" class="site-dialog">
+    <form method="post" action="/site/{{ .ID }}/delete">
+        <h2>Delete site</h2>
+        <p>Delete {{ .FormattedURL }} and its check history?</p>
+        <div class="site-dialog__actions">
+            <button type="submit" formmethod="dialog" formnovalidate>Cancel</button>
+            <button type="submit" class="site-dialog__delete">Delete</button>
+        </div>
+    </form>
+</dialog>
+<script src="/static/site.js"></script>
+</body>
+</html>

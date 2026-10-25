@@ -70,7 +70,7 @@
                         <tbody id="urls-table-body">
                         {{ range .Sites }}
                             <tr>
-                                <td>{{ .URL }}</td>
+                                <td><a href="/site/{{ .ID }}">{{ .URL }}</a></td>
                                 <td>
                                     {{ if eq .Class "available" }}
                                     <div class="status-item">

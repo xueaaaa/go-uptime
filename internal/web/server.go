@@ -45,6 +45,9 @@ func (s *Server) routes() http.Handler {
 
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServerFS(static)))
 	r.Get("/", s.index)
+	r.Get("/site/{site-id}", s.site)
+	r.Post("/site/{site-id}/interval", s.updateInterval)
+	r.Post("/site/{site-id}/delete", s.deleteSite)
 	r.Route("/events", func(r chi.Router) {
 		r.Get("/sites", s.sitesEvents)
 	})
