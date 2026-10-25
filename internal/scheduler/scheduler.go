@@ -2,8 +2,11 @@ package scheduler
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/xueaaaa/go-uptime/internal/config"
+	appErrors "github.com/xueaaaa/go-uptime/internal/errors"
 	"github.com/xueaaaa/go-uptime/internal/job"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
@@ -23,8 +26,8 @@ func NewScheduler(
 	}
 }
 
-func (s *Scheduler) Run(ctx context.Context) error {
-	duration := 10 * time.Second /* TODO: config */
+func (s *Scheduler) Run(ctx context.Context, conf config.Config) error {
+	duration := conf.TickInterval
 	t := time.NewTicker(duration)
 	defer t.Stop()
 	defer close(s.jobs)
@@ -43,6 +46,9 @@ func (s *Scheduler) Run(ctx context.Context) error {
 
 func (s *Scheduler) enqueue(ctx context.Context) error {
 	sites, err := s.siteService.GetAll(ctx)
+	if errors.Is(err, appErrors.NoSites) {
+		return nil
+	}
 	if err != nil {
 		return err
 	}

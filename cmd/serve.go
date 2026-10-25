@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xueaaaa/go-uptime/internal/check/model"
 	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/job"
 	"github.com/xueaaaa/go-uptime/internal/output"
 	"github.com/xueaaaa/go-uptime/internal/processor"
@@ -17,7 +18,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *cobra.Command {
+func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService, conf config.Config) *cobra.Command {
 	var silent bool
 	var enableWeb bool
 
@@ -33,12 +34,12 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *c
 			proc := processor.NewProcessor(results, siteSvc, checkSvc)
 
 			g, ctx := errgroup.WithContext(c.Context())
-			g.Go(func() error { return sched.Run(ctx) })
-			g.Go(func() error { return workPool.Run(ctx) })
+			g.Go(func() error { return sched.Run(ctx, conf) })
+			g.Go(func() error { return workPool.Run(ctx, conf) })
 			g.Go(func() error { return proc.Run(ctx) })
 			g.Go(func() error {
 				if enableWeb {
-					server := web.NewServer("0.0.0.0:8080" /* TODO: config */, siteSvc, checkSvc)
+					server := web.NewServer(conf.ServerAddress, siteSvc, checkSvc)
 					return server.Run(ctx)
 				}
 				return nil

@@ -3,11 +3,12 @@ package cmd
 import (
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 	"github.com/xueaaaa/go-uptime/internal/util"
 )
 
-func NewSiteRemoveCmd(siteSvc service.SiteService) *cobra.Command {
+func NewSiteRemoveCmd(siteSvc service.SiteService, conf config.Config) *cobra.Command {
 	remove := &cobra.Command{
 		Use:   "remove <ip|url>",
 		Short: "Removes the specified site from the list of sites to be checked",
@@ -15,7 +16,7 @@ func NewSiteRemoveCmd(siteSvc service.SiteService) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			arg := args[0]
 
-			h, err := util.CleanAddr(arg, false /* TODO: config */)
+			h, err := util.CleanAddr(arg, conf.SSLDefault)
 
 			if err != nil {
 				return err

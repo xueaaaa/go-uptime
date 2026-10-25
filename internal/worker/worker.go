@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/xueaaaa/go-uptime/internal/check/model"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/job"
 	model2 "github.com/xueaaaa/go-uptime/internal/site/model"
 )
@@ -28,15 +29,15 @@ func NewPool(
 	}
 }
 
-func (p *Pool) Run(ctx context.Context) error {
-	workers := 50 /* TODO: config */
+func (p *Pool) Run(ctx context.Context, conf config.Config) error {
+	workers := conf.Workers
 	wg := sync.WaitGroup{}
 
 	for range workers {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			p.work(ctx)
+			p.work(ctx, conf)
 		}()
 	}
 
@@ -45,7 +46,7 @@ func (p *Pool) Run(ctx context.Context) error {
 	return nil
 }
 
-func (p *Pool) work(ctx context.Context) {
+func (p *Pool) work(ctx context.Context, conf config.Config) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -55,7 +56,7 @@ func (p *Pool) work(ctx context.Context) {
 				return
 			}
 
-			res := p.check(ctx, j)
+			res := p.check(ctx, j, conf)
 			select {
 			case p.results <- res:
 			case <-ctx.Done():
@@ -65,7 +66,7 @@ func (p *Pool) work(ctx context.Context) {
 	}
 }
 
-func (p *Pool) check(ctx context.Context, job job.Job) model.Check {
+func (p *Pool) check(ctx context.Context, job job.Job, conf config.Config) model.Check {
 	base := model.Check{
 		SiteID:    job.SiteID,
 		CheckedAt: time.Now(),
@@ -78,7 +79,7 @@ func (p *Pool) check(ctx context.Context, job job.Job) model.Check {
 		return base
 	}
 
-	timeout := 10 * time.Second /* TODO: config */
+	timeout := conf.TimeoutAfter
 	timeoutCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 	req = req.WithContext(timeoutCtx)

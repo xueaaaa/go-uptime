@@ -6,12 +6,13 @@ import (
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/site/model"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 	"github.com/xueaaaa/go-uptime/internal/util"
 )
 
-func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
+func NewSiteAddCmd(siteSvc service.SiteService, conf config.Config) *cobra.Command {
 	var interval time.Duration
 
 	add := &cobra.Command{
@@ -21,7 +22,7 @@ func NewSiteAddCmd(siteSvc service.SiteService) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			arg := args[0]
 
-			h, err := util.CleanAddr(arg, false /* TODO: config */)
+			h, err := util.CleanAddr(arg, conf.SSLDefault)
 			if err != nil {
 				return err
 			}

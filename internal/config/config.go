@@ -34,7 +34,7 @@ func New() (Config, error) {
 		return Config{}, err
 	}
 
-	configPath := filepath.Join(filepath.Dir(exePath), "config.yaml")
+	configPath := filepath.Join(filepath.Dir(exePath), "config.yml")
 	file, err := os.Open(configPath)
 	if err != nil {
 		return Config{}, err

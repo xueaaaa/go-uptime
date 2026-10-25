@@ -5,10 +5,11 @@ import (
 	cmdChecks "github.com/xueaaaa/go-uptime/cmd/checks"
 	cmdSites "github.com/xueaaaa/go-uptime/cmd/sites"
 	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
-func NewRootCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *cobra.Command {
+func NewRootCmd(siteSvc service.SiteService, checkSvc service2.CheckService, conf config.Config) *cobra.Command {
 	root := &cobra.Command{
 		Use:           "go-uptime",
 		Short:         "Automatic website availability monitoring",
@@ -17,9 +18,9 @@ func NewRootCmd(siteSvc service.SiteService, checkSvc service2.CheckService) *co
 	}
 
 	root.AddCommand(
-		cmdSites.NewSitesCmd(siteSvc),
+		cmdSites.NewSitesCmd(siteSvc, conf),
 		cmdChecks.NewChecksCmd(checkSvc, siteSvc),
-		NewServeCmd(siteSvc, checkSvc),
+		NewServeCmd(siteSvc, checkSvc, conf),
 	)
 
 	return root
