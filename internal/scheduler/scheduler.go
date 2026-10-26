@@ -38,7 +38,7 @@ func (s *Scheduler) Run(ctx context.Context, conf config.Config) error {
 			return nil
 		case <-t.C:
 			if err := s.enqueue(ctx); err != nil {
-				return err /* TODO: Log instead of return */
+				return err
 			}
 		}
 	}
@@ -59,7 +59,7 @@ func (s *Scheduler) enqueue(ctx context.Context) error {
 			site.LastCheckAt = &now
 			site.NextCheckAt = now.Add(site.Interval)
 			if err = s.siteService.Update(ctx, site); err != nil {
-				return err /* TODO: Log instead of return */
+				return err
 			}
 
 			select {

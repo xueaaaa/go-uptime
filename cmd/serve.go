@@ -34,7 +34,10 @@ func NewServeCmd(siteSvc service.SiteService, checkSvc service2.CheckService, co
 			proc := processor.NewProcessor(results, siteSvc, checkSvc)
 
 			g, ctx := errgroup.WithContext(c.Context())
-			g.Go(func() error { return sched.Run(ctx, conf) })
+			g.Go(func() error {
+				_ = sched.Run(ctx, conf)
+				return nil
+			})
 			g.Go(func() error { return workPool.Run(ctx, conf) })
 			g.Go(func() error { return proc.Run(ctx) })
 			g.Go(func() error {
