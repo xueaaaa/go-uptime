@@ -1,0 +1,14 @@
+ssl_default: false
+server_address: 0.0.0.0:8080
+tick_interval: 10s
+workers: 50
+timeout_after: 10s
+
+database:
+  user: root
+  password: root
+  host: db
+  port: 5432
+  db: go-uptime
+  min_conns: 5
+  max_conns: 25

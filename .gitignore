@@ -8,9 +8,6 @@
 
 *.out
 
-config.yml
-docker-compose.yml
-Makefile
 .idea/
 .idea/**/workspace.xml
 .idea/**/tasks.xml

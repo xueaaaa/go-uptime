@@ -9,4 +9,4 @@ COPY . .
 
 RUN go build -o go-uptime .
 
-ENTRYPOINT ["./go-uptime"]
+ENTRYPOINT ["./go-uptime", "serve"]
