@@ -6,11 +6,12 @@ import (
 
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 	"github.com/xueaaaa/go-uptime/internal/util"
 )
 
-func NewSiteIntervalCmd(siteSvc service.SiteService) *cobra.Command {
+func NewSiteIntervalCmd(siteSvc service.SiteService, conf config.Config) *cobra.Command {
 	interval := &cobra.Command{
 		Use:   "interval <ip|url> <interval>",
 		Short: "Changes the period for checking the website availability (minimum - 10 seconds)",
@@ -18,7 +19,7 @@ func NewSiteIntervalCmd(siteSvc service.SiteService) *cobra.Command {
 		RunE: func(c *cobra.Command, args []string) error {
 			siteArg := args[0]
 
-			h, err := util.CleanAddr(siteArg, false /* TODO: config */)
+			h, err := util.CleanAddr(siteArg, conf.SSLDefault)
 			if err != nil {
 				return err
 			}

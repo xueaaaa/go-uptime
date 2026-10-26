@@ -2,12 +2,14 @@ package output
 
 import (
 	"context"
+	"errors"
 	"slices"
 	"time"
 
 	"github.com/pterm/pterm"
 	"github.com/xueaaaa/go-uptime/internal/check/model"
 	"github.com/xueaaaa/go-uptime/internal/check/service"
+	errors2 "github.com/xueaaaa/go-uptime/internal/errors"
 	service2 "github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
@@ -23,7 +25,7 @@ func LiveChecks(ctx context.Context, checkSvc service.CheckService, siteSvc serv
 
 	render := func() error {
 		checks, err := checkSvc.GetAll(ctx)
-		if err != nil {
+		if err != nil && !errors.Is(err, errors2.NoChecks) {
 			return err
 		}
 

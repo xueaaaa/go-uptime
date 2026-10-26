@@ -9,6 +9,7 @@ import (
 	"github.com/xueaaaa/go-uptime/cmd"
 	repository2 "github.com/xueaaaa/go-uptime/internal/check/repository"
 	service2 "github.com/xueaaaa/go-uptime/internal/check/service"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/postgres"
 	"github.com/xueaaaa/go-uptime/internal/site/repository"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
@@ -22,10 +23,15 @@ func main() {
 }
 
 func run() error {
+	conf, err := config.New()
+	if err != nil {
+		return err
+	}
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	pool, err := postgres.NewConn(ctx)
+	pool, err := postgres.NewConn(ctx, conf)
 	if err != nil {
 		return err
 	}
@@ -36,5 +42,5 @@ func run() error {
 	checkRepo := repository2.NewCheckRepository(pool)
 	checkSvc := service2.NewCheckService(checkRepo)
 
-	return cmd.NewRootCmd(siteSvc, checkSvc).ExecuteContext(ctx)
+	return cmd.NewRootCmd(siteSvc, checkSvc, conf).ExecuteContext(ctx)
 }

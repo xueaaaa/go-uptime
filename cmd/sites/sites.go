@@ -3,11 +3,12 @@ package cmd
 import (
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
+	"github.com/xueaaaa/go-uptime/internal/config"
 	"github.com/xueaaaa/go-uptime/internal/output"
 	"github.com/xueaaaa/go-uptime/internal/site/service"
 )
 
-func NewSitesCmd(siteSvc service.SiteService) *cobra.Command {
+func NewSitesCmd(siteSvc service.SiteService, conf config.Config) *cobra.Command {
 	sites := &cobra.Command{
 		Use:   "sites",
 		Short: "Displays a summary table of added sites",
@@ -51,9 +52,9 @@ func NewSitesCmd(siteSvc service.SiteService) *cobra.Command {
 	}
 
 	sites.AddCommand(
-		NewSiteAddCmd(siteSvc),
-		NewSiteRemoveCmd(siteSvc),
-		NewSiteIntervalCmd(siteSvc),
+		NewSiteAddCmd(siteSvc, conf),
+		NewSiteRemoveCmd(siteSvc, conf),
+		NewSiteIntervalCmd(siteSvc, conf),
 	)
 	return sites
 }

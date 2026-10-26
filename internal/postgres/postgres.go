@@ -3,27 +3,27 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/xueaaaa/go-uptime/internal/config"
 )
 
-func NewConn(ctx context.Context) (*pgxpool.Pool, error) {
+func NewConn(ctx context.Context, conf config.Config) (*pgxpool.Pool, error) {
 	connString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
-		os.Getenv("USER"),
-		os.Getenv("PASSWORD"),
-		os.Getenv("HOST"),
-		os.Getenv("PORT"),
-		os.Getenv("DB"),
-	) /* TODO: config */
+		conf.User,
+		conf.Password,
+		conf.Host,
+		conf.Port,
+		conf.DB,
+	)
 
 	config, err := pgxpool.ParseConfig(connString)
 	if err != nil {
 		return nil, err
 	}
-	config.MinConns = 5  /* TODO: config */
-	config.MaxConns = 25 /* TODO: config */
+	config.MinConns = conf.MinConns
+	config.MaxConns = conf.MaxConns
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {

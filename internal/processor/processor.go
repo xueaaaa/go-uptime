@@ -35,11 +35,11 @@ func (p *Processor) Run(ctx context.Context) error {
 			}
 
 			if _, err := p.checkService.Create(ctx, res); err != nil {
-				return err /* TODO: Log instead of return */
+				return err
 			}
 
 			if err := p.siteService.UpdateByCheck(ctx, res); err != nil {
-				return err /* TODO: Log instead of return */
+				return err
 			}
 		}
 	}
