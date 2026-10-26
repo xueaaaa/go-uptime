@@ -31,7 +31,7 @@ func NewSiteIntervalCmd(siteSvc service.SiteService, conf config.Config) *cobra.
 			}
 
 			if interval <= 10*time.Second {
-				fmt.Errorf("interval must be at least 10s, got %s", interval)
+				return fmt.Errorf("interval must be at least 10s, got %s", interval)
 			}
 
 			site, err := siteSvc.GetByUrl(c.Context(), h)
