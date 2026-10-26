@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -94,16 +95,25 @@ func (p *Pool) check(ctx context.Context, job job.Job, conf config.Config) model
 	}
 	defer resp.Body.Close()
 
-	_, _ = io.Copy(io.Discard, resp.Body)
-
 	switch {
 	case resp.StatusCode >= 200 && resp.StatusCode < 300:
+		_, _ = io.Copy(io.Discard, resp.Body)
 		base.Status = model2.Available
 		base.StatusCode = resp.StatusCode
+
 	default:
 		base.Status = model2.Unavailable
 		base.StatusCode = resp.StatusCode
-		base.Error = fmt.Sprintf("unexpected status code: %d", resp.StatusCode)
+
+		body, err := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		if err != nil {
+			base.Error = err.Error()
+		} else {
+			base.Error = strings.TrimSpace(string(body))
+		}
+		if base.Error == "" {
+			base.Error = fmt.Sprintf("unexpected status code: %d", resp.StatusCode)
+		}
 	}
 
 	return base
