@@ -15,9 +15,11 @@ run:
 	go mod tidy && \
 	go run .
 
-compose-run:
-	docker compose down --remove-orphans && \
-	docker compose run --service-ports app serve
+config.yml: config_example.yml
+	cp config_example.yml config.yml
+
+compose-run: config.yml
+	docker compose up --build app
 
 test:
 	go test -v ./...
