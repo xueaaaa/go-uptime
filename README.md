@@ -1,4 +1,4 @@
-# go-duplicate
+# go-uptime
 
 ![Build](https://github.com/xueaaaa/go-uptime/actions/workflows/ci.yml/badge.svg)
 ![Go Version](https://img.shields.io/github/go-mod/go-version/xueaaaa/go-uptime)
