@@ -17,7 +17,7 @@ A CLI tool with a web panel for monitoring resource availability. Supports HTTP 
 
 ## Requirments
 
-go-duplicate requires Docker Compose to run. (See the following [instructions](https://docs.docker.com/compose/install/) to install it)
+go-uptime requires Docker Compose to run. (See the following [instructions](https://docs.docker.com/compose/install/) to install it)
 
 ## Installation and usage
 
